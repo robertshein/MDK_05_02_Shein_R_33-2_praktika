@@ -1,6 +1,24 @@
 var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
+builder.Services.AddMvc(option => option.EnableEndpointRouting = true);
+builder.Services.AddSwaggerGen(option => {
+    option.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Version = "v1",
+        Title = "Инструментарий"
+    });
+    string PathFile = Path.Combine(AppContext.BaseDirectory, "KeyPass_Shein.xml");
+    option.IncludeXmlComments(PathFile);
+});
 
-app.MapGet("/", () => "Hello World!");
+var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI(c => {
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Инструментарий");
+});
+app.UseRouting();
+app.UseEndpoints(endpoints => 
+{
+    endpoints.MapControllers();
+});
 
 app.Run();
