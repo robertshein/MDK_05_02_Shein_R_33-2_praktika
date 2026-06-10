@@ -16,6 +16,8 @@ namespace KeyPass_Shein.Models
 
         public string Password { get; set; }
 
+        public int UserId { get; set; }
+
         [ForeignKey("UserId")]
         public User User { get; set; }
     }

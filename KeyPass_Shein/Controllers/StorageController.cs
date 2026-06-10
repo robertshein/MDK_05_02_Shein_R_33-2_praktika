@@ -23,14 +23,14 @@ namespace KeyPass_Shein.Controllers
                     return StatusCode(401);
 
                 List<StorageDto> Storages = databaseManager.Storages
-                    .Where(x => x.User.Id == IdUser) 
-                    .Select(s => new StorageDto     
+                    .Where(x => x.User.Id == IdUser)
+                    .Select(s => new StorageDto
                     {
                         Id = s.Id,
                         Name = s.Name,
                         Url = s.Url,
                         Login = s.Login,
-                        Password = s.Password,
+                        Password = PasswordEncryptor.Decrypt(s.Password),
                     })
                     .ToList();
                 return Ok(Storages);
@@ -50,14 +50,18 @@ namespace KeyPass_Shein.Controllers
                 int? IdUser = JwtToken.GetUserIdFromToken(token);
                 if (IdUser == null)
                     return StatusCode(401);
+
+                storage.Password = PasswordEncryptor.Encrypt(storage.Password);
+
                 storage.User = databaseManager.Users
                     .Where(x => x.Id == IdUser)
-                    .First();  
+                    .First();
 
                 databaseManager.Add(storage);
                 databaseManager.SaveChanges();
 
                 storage.User = null;
+                storage.Password = PasswordEncryptor.Decrypt(storage.Password);
                 return StatusCode(200, storage);
             }
             catch (Exception exp)
@@ -77,13 +81,15 @@ namespace KeyPass_Shein.Controllers
                     .Where(x => x.Id == storage.Id)
                     .FirstOrDefault();
                 if (IdUser == null)
-                    return StatusCode(401); 
+                    return StatusCode(401);
                 if (uStorage == null)
-                    return StatusCode(404); 
+                    return StatusCode(404);
+
                 uStorage.Name = storage.Name;
                 uStorage.Url = storage.Url;
                 uStorage.Login = storage.Login;
-                uStorage.Password = storage.Password;  
+                uStorage.Password = PasswordEncryptor.Encrypt(storage.Password);
+
                 databaseManager.SaveChanges();
                 storage.User = null;
                 return StatusCode(200, storage);
@@ -102,12 +108,13 @@ namespace KeyPass_Shein.Controllers
             {
                 int? IdUser = JwtToken.GetUserIdFromToken(token);
                 Storage? Storage = databaseManager.Storages
-                    .Where(x => x.Id == id && x.User.Id == IdUser) 
+                    .Where(x => x.Id == id && x.User.Id == IdUser)
                     .FirstOrDefault();
                 if (IdUser == null)
                     return StatusCode(401);
                 if (Storage == null)
                     return StatusCode(404);
+
                 databaseManager.Storages.Remove(Storage);
                 databaseManager.SaveChanges();
 

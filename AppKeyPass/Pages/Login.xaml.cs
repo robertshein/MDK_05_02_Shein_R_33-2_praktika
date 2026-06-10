@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AppKeyPass.Contexts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -50,6 +51,11 @@ namespace AppKeyPass.Pages
             }
 
             Auth(tbLogin.Text, tbPassword.Password);
+        }
+
+        private void BtnRegister(object sender, RoutedEventArgs e)
+        {
+            MainWindow.Init.OpenPages(new Pages.Register());
         }
     }
 }

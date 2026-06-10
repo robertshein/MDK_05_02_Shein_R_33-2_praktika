@@ -9,13 +9,15 @@ namespace KeyPass_Shein.Classes
 
         public DbSet<User> Users { get; set; }
 
-        public DatabaseManager() =>
-            Database.EnsureCreated(); 
+        public DatabaseManager()
+        {
+            try { Database.EnsureCreated(); } catch { }
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySql(
-                "server=127.0.0.1;uid=student;pwd=;database=Storage;",
+                "server=127.0.0.1;uid=root;pwd=;database=Storage;",
                 new MySqlServerVersion(new Version(8, 0, 11)));
         }
     }
